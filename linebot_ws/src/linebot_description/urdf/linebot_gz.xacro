@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<!--
+  Gazebo Harmonic glue for a differential-drive line follower.
+  If you use your own URDF, just:
+      <xacro:include filename="$(find linebot_description)/urdf/linebot_gz.xacro"/>
+      <xacro:linebot_gz left_joint="..." right_joint="..." wheel_separation="..."
+                        wheel_radius="..." camera_link="..."/>
+  and make sure the camera link exists (x forward, z up).
+-->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:macro name="linebot_gz"
+               params="left_joint right_joint wheel_separation wheel_radius
+                       camera_link:=camera_link
+                       camera_frame:=camera_optical_frame
+                       cam_width:=640 cam_height:=480 cam_fps:=30 cam_hfov:=1.2">
+
+    <gazebo>
+      <!-- cmd_vel -> wheel velocities, publishes odom + odom->base_link TF -->
+      <plugin filename="gz-sim-diff-drive-system" name="gz::sim::systems::DiffDrive">
+        <left_joint>${left_joint}</left_joint>
+        <right_joint>${right_joint}</right_joint>
+        <wheel_separation>${wheel_separation}</wheel_separation>
+        <wheel_radius>${wheel_radius}</wheel_radius>
+        <odom_publish_frequency>50</odom_publish_frequency>
+        <topic>cmd_vel</topic>
+        <odom_topic>odom</odom_topic>
+        <tf_topic>tf</tf_topic>
+        <frame_id>odom</frame_id>
+        <child_frame_id>base_link</child_frame_id>
+        <max_linear_acceleration>2.0</max_linear_acceleration>
+        <max_angular_acceleration>8.0</max_angular_acceleration>
+      </plugin>
+
+      <!-- wheel joint states so robot_state_publisher can animate the wheels -->
+      <plugin filename="gz-sim-joint-state-publisher-system"
+              name="gz::sim::systems::JointStatePublisher">
+        <topic>joint_states</topic>
+      </plugin>
+    </gazebo>
+
+    <!-- Downward-looking RGB camera. Needs the Sensors system (ogre2) in the world. -->
+    <gazebo reference="${camera_link}">
+      <sensor name="line_camera" type="camera">
+        <gz_frame_id>${camera_frame}</gz_frame_id>
+        <always_on>true</always_on>
+        <visualize>false</visualize>
+        <update_rate>${cam_fps}</update_rate>
+        <topic>camera/image_raw</topic>
+        <camera>
+          <horizontal_fov>${cam_hfov}</horizontal_fov>
+          <image>
+            <width>${cam_width}</width>
+            <height>${cam_height}</height>
+            <format>R8G8B8</format>
+          </image>
+          <clip>
+            <near>0.02</near>
+            <far>3.0</far>
+          </clip>
+        </camera>
+      </sensor>
+    </gazebo>
+  </xacro:macro>
+</robot>

@@ -1,0 +1,25 @@
+# Spawn pose per track (metres, radians). Written by generate_track.py.
+circle:
+  x: 0.0
+  y: 0.0
+  yaw: 0.046
+figure_eight:
+  x: 1.5
+  y: 0.0
+  yaw: -1.601
+oval:
+  x: 0.0
+  y: 0.0
+  yaw: 0.0
+s_curve:
+  x: 0.0
+  y: 0.0
+  yaw: 0.665
+square_loop:
+  x: 0.4
+  y: 0.0
+  yaw: 0.0
+straight:
+  x: 0.0
+  y: 0.0
+  yaw: 0.0
